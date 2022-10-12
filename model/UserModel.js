@@ -34,13 +34,34 @@ const userSchema = mongoose.Schema({
     trim: true,
   },
   userInterests: [
-    { type: String, required: true, uppercase: true, trim: true },
+    {
+      type: String,
+      required: true,
+      trim: true,
+      enum: [
+        "Reading",
+        "Writing",
+        "Sports",
+        "Hiking",
+        "Movies",
+        "Cooking",
+        "Singing",
+        "Travelling",
+        "Painting",
+        "Music",
+        "Gardening",
+        "Socializing",
+        "Pets",
+        "Meditaion",
+        "Running",
+      ],
+    },
   ],
   userPackageId: {
     type: mongoose.Types.ObjectId,
     ref: "packageDetails",
     trim: true,
-  }
+  },
 });
 
 const user = mongoose.model("userDetails", userSchema);

@@ -1,0 +1,24 @@
+{
+  "name": "astroaipity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nileshvishwakarma51/Astroaipity.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nileshvishwakarma51/Astroaipity/issues"
+  },
+  "homepage": "https://github.com/nileshvishwakarma51/Astroaipity#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^4.10.0",
+    "mongoose": "^6.6.5"
+  }
+}

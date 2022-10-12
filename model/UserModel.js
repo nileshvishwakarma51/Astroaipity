@@ -62,6 +62,26 @@ const userSchema = mongoose.Schema({
     ref: "packageDetails",
     trim: true,
   },
+  userRelationshipStatus: {
+    type: String,
+    required: true,
+    trim: true,
+    enum: ["Single", "Divorced", "Widow"]
+  },
+  userAboutMe: {
+    type: String,
+    trim: true,
+  },
+  userDOB:{
+    type: Date,
+    required: true,
+    trim: true,
+  },
+  userLocation:{
+    type: String,
+    uppercase: true,
+    trim: true,
+  }
 });
 
 const user = mongoose.model("userDetails", userSchema);

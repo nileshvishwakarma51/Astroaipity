@@ -9,7 +9,8 @@ let createUser = async (req, res) => {
       req.body.userEmail &&
       req.body.userPassword &&
       req.body.userName &&
-      req.body.userInterests
+      req.body.userInterests &&
+      req.body.userRelationshipStatus
     ) {
       userObj.userName = req.body.userName;
       userObj.userPurpose = req.body.userPurpose;
@@ -17,12 +18,16 @@ let createUser = async (req, res) => {
       userObj.userPassword = req.body.userPassword;
       userObj.userInterests = req.body.userInterests;
       userObj.userGender = req.body.userGender;
+      userObj.userRelationshipStatus = req.body.userRelationshipStatus;
+      userObj.userAboutMe = req.body.userAboutMe;
+      userObj.userDOB = req.body.userDOB;
+      userObj.userLocation = req.body.userLocation;
     } else {
       return res.send(
-        `userName, userPurpose, userEmail, userPassword, userInterests, userGender are required field`
+        `userName, userPurpose, userEmail, userPassword, userInterests, userGender, userRelationshipStatus are required field`
       );
     }
-    
+
     console.log("user ka object---------->", userObj);
 
     let createdUser = await userModelMethod.createUser(userObj);

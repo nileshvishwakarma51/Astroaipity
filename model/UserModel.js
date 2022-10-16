@@ -3,58 +3,82 @@ const mongoose = require("mongoose");
 const userSchema = mongoose.Schema({
   userGender: {
     type: String,
-    required: true,
+    required: { value: true, message: "Gender field is required" },
     trim: true,
-    enum: ["Male", "Female", "Others"],
+    enum: {
+      values: ["Male", "Female", "Others"],
+      message: "Valid input types for gender are 'Male', 'Female', 'Others'",
+    },
   },
   userPurpose: {
     type: String,
-    required: true,
+    required: { value: true, message: "Purpose field is required" },
     trim: true,
-    enum: ["Dating", "Relation", "Marriage"],
+    enum: {
+      values: ["Dating", "Relation", "Marriage"],
+      message: "Valid input types for purpose are 'Dating', 'Relation', 'Marriage'",
+    },
   },
   userEmail: {
     type: String,
-    required: true,
+    required: { value: true, message: "Email field is required" },
     lowercase: true,
     trim: true,
-    unique: true,
+    unique: { value: true, message: "Email should be unique" },
   },
   userPassword: {
     type: String,
-    required: true,
+    required: { value: true, message: "Password field is required" },
     trim: true,
-    minlength: 8,
-    maxlength: 16,
+    validate : {
+      validator : (data)=>{
+          if(data.length >=8 && data.length <=16 ){
+              return true; //validation success
+          }
+          else{
+              return false; // validation failure
+          }
+      },
+      message : "Password length mismatch. Length must be >=8 and <=16"
+  }
   },
-  userName: {
+  userFname: {
     type: String,
-    required: true,
+    required: { value: true, message: "First name is required" },
+    uppercase: true,
+    trim: true,
+  },
+  userLname: {
+    type: String,
+    required: { value: true, message: "Last name is required" },
     uppercase: true,
     trim: true,
   },
   userInterests: [
     {
       type: String,
-      required: true,
+      required: { value: true, message: "Interests field is required" },
       trim: true,
-      enum: [
-        "Reading",
-        "Writing",
-        "Sports",
-        "Hiking",
-        "Movies",
-        "Cooking",
-        "Singing",
-        "Travelling",
-        "Painting",
-        "Music",
-        "Gardening",
-        "Socializing",
-        "Pets",
-        "Meditaion",
-        "Running",
-      ],
+      enum: {
+        values: [
+          "Reading",
+          "Writing",
+          "Sports",
+          "Hiking",
+          "Movies",
+          "Cooking",
+          "Singing",
+          "Travelling",
+          "Painting",
+          "Music",
+          "Gardening",
+          "Socializing",
+          "Pets",
+          "Meditaion",
+          "Running",
+        ],
+        message: "Valid input types for Interests are 'Reading', 'Writing', 'Sports', 'Hiking', 'Movies', 'Cooking', 'Singing', 'Travelling', 'Painting', 'Music',   'Gardening', 'Socializing',  'Pets',   'Meditaion',    'Running'",
+      },
     },
   ],
   userPackageId: {
@@ -64,36 +88,119 @@ const userSchema = mongoose.Schema({
   },
   userRelationshipStatus: {
     type: String,
-    required: true,
+    required: { value: true, message: "Relationship status field is required" },
     trim: true,
-    enum: ["Single", "Divorced", "Widow"]
+    enum: {
+      values: ["Single", "Divorced", "Widow"],
+      message: "Valid input types for relationship status are 'Single', 'Divorced', 'Widow'",
+    },
+  },
+  userHaveKids: {
+    type: String,
+    required: { value: true, message: "Do you have kids? field is required" },
+    trim: true,
+    enum: {
+      values: ["Yes", "No"],
+      message: "Do you have kids? Valid input types are 'Yes', 'No'",
+    },
+  },
+  userWantChildren: {
+    type: String,
+    required: {
+      value: true,
+      message: "Do you want children? field is required",
+    },
+    trim: true,
+    enum: {
+      values: ["Yes", "No"],
+      message: "Do you want children? Valid input types are 'Yes', 'No'",
+    },
+  },
+  userHeight: {
+    type: String,
+    required: { value: true, message: "Height field is required" },
+    trim: true,
+  },
+  userEducationStatus: {
+    type: String,
+    required: { value: true, message: "Education status field is required" },
+    trim: true,
+    enum: {
+      values: ["High School", "Bachelor's", "Master's", "Phd"],
+      message:
+        "Valid input types for education status are 'High School', 'Bachelor's', 'Master's', 'Phd'" },
+  },
+  userEthnicity: {
+    type: String,
+    required: { value: true, message: "Ethnicity field is required" },
+    trim: true,
+    enum: {
+      values: [
+        "Asian",
+        "Black",
+        "Hispanic",
+        "Indian",
+        "White",
+        "North American",
+        "Middle Eastern",
+        "Other",
+      ],
+      message: "Valid input types for Ethnicity are 'Asian', 'Black', 'Hispanic', 'Indian', 'White', 'North American', 'Middle Eastern', 'Other'"
+    },
+  },
+  userDrink: {
+    type: String,
+    required: { value: true, message: "Do you drink? field is required" },
+    trim: true,
+    enum: {
+      values: ["Yes", "No", "Occasionally"],
+      message: "Do you drink? Valid input types are 'Yes', 'No', 'Occasionally'",
+    },
+  },
+  userSmoke: {
+    type: String,
+    required: { value: true, message: "Do you smoke? field is required" },
+    trim: true,
+    enum: {
+      values: ["Yes", "No", "Occasionally"],
+      message: "Do you smoke? Valid input types are 'Yes', 'No', 'Occasionally'",
+    },
+  },
+  userProfilePicture: {
+    type: String,
+    required: { value: true, message: "Profile picture field is required" },
+    trim: true,
   },
   userAboutMe: {
     type: String,
     trim: true,
   },
-  userDOB:{
+  userDOB: {
     type: Date,
-    required: true,
+    required: { value: true, message: "Date-of-birth field is required" },
     trim: true,
   },
-  userLocation:{
+  userLocation: {
     type: String,
     uppercase: true,
     trim: true,
-  }
+  },
 });
 
 const user = mongoose.model("userDetails", userSchema);
 
 const createUser = async (userObj) => {
-  console.log("create user ----------> :", userObj);
   try {
     const createdUser = await user.create(userObj);
     return createdUser;
   } catch (err) {
-    console.log(err);
-    throw new Error(err.message);
+    if (err.name == "ValidationError") {
+      for (field in err.errors) {
+        throw { message: err.errors[field].message };
+        break;
+      }
+    }
+    throw { message: err.message };
   }
 };
 

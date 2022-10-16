@@ -5,7 +5,9 @@ const { PORT, dbUrl } = require("./config/config");
 const userRouter = require("./routes/user.routes");
 mongoose.connect(dbUrl);
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use("/User", userRouter);
 
 app.listen(PORT, (err, res) => {

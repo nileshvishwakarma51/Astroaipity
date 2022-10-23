@@ -28,7 +28,6 @@ const deleteFile = (req) => {
     if (err) {
       console.log(err);
     }
-    console.log("File has been Deleted", req.file.path);
   });
 };
 

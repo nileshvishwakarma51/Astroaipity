@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+var defaultId = mongoose.Types.ObjectId(12345678);
 
 const userSchema = mongoose.Schema({
   userGender: {
@@ -16,7 +17,8 @@ const userSchema = mongoose.Schema({
     trim: true,
     enum: {
       values: ["Dating", "Relation", "Marriage"],
-      message: "Valid input types for purpose are 'Dating', 'Relation', 'Marriage'",
+      message:
+        "Valid input types for purpose are 'Dating', 'Relation', 'Marriage'",
     },
   },
   userEmail: {
@@ -29,18 +31,7 @@ const userSchema = mongoose.Schema({
   userPassword: {
     type: String,
     required: { value: true, message: "Password field is required" },
-    trim: true,
-    validate : {
-      validator : (data)=>{
-          if(data.length >=8 && data.length <=16 ){
-              return true; //validation success
-          }
-          else{
-              return false; // validation failure
-          }
-      },
-      message : "Password length mismatch. Length must be >=8 and <=16"
-  }
+    trim: true
   },
   userFname: {
     type: String,
@@ -59,32 +50,13 @@ const userSchema = mongoose.Schema({
       type: String,
       required: { value: true, message: "Interests field is required" },
       trim: true,
-      enum: {
-        values: [
-          "Reading",
-          "Writing",
-          "Sports",
-          "Hiking",
-          "Movies",
-          "Cooking",
-          "Singing",
-          "Travelling",
-          "Painting",
-          "Music",
-          "Gardening",
-          "Socializing",
-          "Pets",
-          "Meditaion",
-          "Running",
-        ],
-        message: "Valid input types for Interests are 'Reading', 'Writing', 'Sports', 'Hiking', 'Movies', 'Cooking', 'Singing', 'Travelling', 'Painting', 'Music',   'Gardening', 'Socializing',  'Pets',   'Meditaion',    'Running'",
-      },
     },
   ],
   userPackageId: {
     type: mongoose.Types.ObjectId,
     ref: "packageDetails",
     trim: true,
+    default : defaultId
   },
   userRelationshipStatus: {
     type: String,
@@ -92,7 +64,8 @@ const userSchema = mongoose.Schema({
     trim: true,
     enum: {
       values: ["Single", "Divorced", "Widow"],
-      message: "Valid input types for relationship status are 'Single', 'Divorced', 'Widow'",
+      message:
+        "Valid input types for relationship status are 'Single', 'Divorced', 'Widow'",
     },
   },
   userHaveKids: {
@@ -128,7 +101,8 @@ const userSchema = mongoose.Schema({
     enum: {
       values: ["High School", "Bachelor's", "Master's", "Phd"],
       message:
-        "Valid input types for education status are 'High School', 'Bachelor's', 'Master's', 'Phd'" },
+        "Valid input types for education status are 'High School', 'Bachelor's', 'Master's', 'Phd'",
+    },
   },
   userEthnicity: {
     type: String,
@@ -145,7 +119,8 @@ const userSchema = mongoose.Schema({
         "Middle Eastern",
         "Other",
       ],
-      message: "Valid input types for Ethnicity are 'Asian', 'Black', 'Hispanic', 'Indian', 'White', 'North American', 'Middle Eastern', 'Other'"
+      message:
+        "Valid input types for Ethnicity are 'Asian', 'Black', 'Hispanic', 'Indian', 'White', 'North American', 'Middle Eastern', 'Other'",
     },
   },
   userDrink: {
@@ -154,7 +129,8 @@ const userSchema = mongoose.Schema({
     trim: true,
     enum: {
       values: ["Yes", "No", "Occasionally"],
-      message: "Do you drink? Valid input types are 'Yes', 'No', 'Occasionally'",
+      message:
+        "Do you drink? Valid input types are 'Yes', 'No', 'Occasionally'",
     },
   },
   userSmoke: {
@@ -163,7 +139,8 @@ const userSchema = mongoose.Schema({
     trim: true,
     enum: {
       values: ["Yes", "No", "Occasionally"],
-      message: "Do you smoke? Valid input types are 'Yes', 'No', 'Occasionally'",
+      message:
+        "Do you smoke? Valid input types are 'Yes', 'No', 'Occasionally'",
     },
   },
   userProfilePicture: {
@@ -174,16 +151,19 @@ const userSchema = mongoose.Schema({
   userAboutMe: {
     type: String,
     trim: true,
+    default : "Not provided"
   },
   userDOB: {
     type: Date,
     required: { value: true, message: "Date-of-birth field is required" },
     trim: true,
+    default : "Not provided"
   },
   userLocation: {
     type: String,
     uppercase: true,
     trim: true,
+    default : "Not provided"
   },
 });
 
@@ -194,12 +174,16 @@ const createUser = async (userObj) => {
     const createdUser = await user.create(userObj);
     return createdUser;
   } catch (err) {
-    if (err.name == "ValidationError") {
-      for (field in err.errors) {
-        throw { message: err.errors[field].message };
-        break;
+    if (err.code === 11000) {
+      throw { message: "email must be unique" };
+    } else {
+      if (err.name == "ValidationError") {
+        for (field in err.errors) {
+          throw { message: err.errors[field].message };
+        }
       }
     }
+
     throw { message: err.message };
   }
 };

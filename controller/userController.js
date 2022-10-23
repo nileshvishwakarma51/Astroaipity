@@ -1,5 +1,7 @@
 const userModelMethod = require("../model/userModel");
 const multer = require("multer");
+const fs = require("fs");
+var bcrypt = require("bcryptjs");
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -21,99 +23,157 @@ const upload = multer({
   },
 }).single("userProfilePicture");
 
+const deleteFile = (req) => {
+  fs.unlink(req.file.path, function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log("File has been Deleted", req.file.path);
+  });
+};
+
 let createUser = async (req, res) => {
   upload(req, res, async (err) => {
-    if (req.file) {
-      if (err) {
-        return res.send(err.message);
-      } else {
-        try {
-          const {
-            userGender,
-            userPurpose,
-            userEmail,
-            userPassword,
-            userFname,
-            userLname,
-            userInterests,
-            userHaveKids,
-            userWantChildren,
-            userHeight,
-            userEducationStatus,
-            userEthnicity,
-            userDrink,
-            userSmoke,
-            userDOB,
-            userLocation,
-            userRelationshipStatus,
-          } = req.body;
-
-          if(!req.file.path){
-            return res.send("Something went wrong with profile picture. Please try again!");
-          }
-          req.body.userProfilePicture = req.file.path;
-          if (!userGender) {
-            return res.send("Gender is required");
-          }
-          if (!userPurpose) {
-            return res.send("Purpose is required");
-          }
-          if (!userEmail) {
-            return res.send("Email is required");
-          }
-          if (!userPassword) {
-            return res.send("Password is required");
-          }
-          if (!userFname) {
-            return res.send("First name is required");
-          }
-          if (!userLname) {
-            return res.send("Last name is required");
-          }
-          if (!userInterests) {
-            return res.send("Interests is required");
-          }
-          console.log(userInterests);
-          if (!userHaveKids) {
-            return res.send("Do you have kids? field is required");
-          }
-          if (!userWantChildren) {
-            return res.send("Do you want kids? field is required");
-          }
-          if (!userHeight) {
-            return res.send("Height is required");
-          }
-          if (!userEducationStatus) {
-            return res.send("Education status is required");
-          }
-          if (!userEthnicity) {
-            return res.send("Ethnicity is required");
-          }
-          if (!userDrink) {
-            return res.send("Do you drink? field is required");
-          }
-          if (!userSmoke) {
-            return res.send("Do you smoke? field is required");
-          }
-          if (!userDOB) {
-            return res.send("DOB is required");
-          }
-          if (!userLocation) {
-            return res.send("Location is required");
-          }
-          if (!userRelationshipStatus) {
-            return res.send("Relationship status is required");
-          }
-          
-
-          let createdUser = await userModelMethod.createUser(req.body);
-          res.status(200).send(`user signup Sucessfull:\n ${createdUser}`);
-        } catch (err) {
-          res.status(400).send(err);
-        }
-      }
+    if (err) {
+      res.send(err.message);
     } else {
-      res.send("Profile picture is required");
+      try {
+        const {
+          userGender,
+          userPurpose,
+          userEmail,
+          userPassword,
+          userFname,
+          userLname,
+          userInterests,
+          userHaveKids,
+          userWantChildren,
+          userHeight,
+          userEducationStatus,
+          userEthnicity,
+          userDrink,
+          userSmoke,
+          userDOB,
+          userLocation,
+          userRelationshipStatus,
+        } = req.body;
+
+        if (!req.file) {
+          return res.send("Profile is required");
+        }
+        if (!userGender) {
+          deleteFile(req);
+          return res.send("Gender is required");
+        }
+        if (!userPurpose) {
+          deleteFile(req);
+          return res.send("Purpose is required");
+        }
+        if (!userEmail) {
+          deleteFile(req);
+          return res.send("Email is required");
+        }
+        if (!userPassword) {
+          deleteFile(req);
+          return res.send("Password is required");
+        } else {
+          if (!userPassword.length >= 8 && userPassword.length <= 16) {
+              return res.send("Password length mismatch. Length must be >=8 and <=16"); //validation success
+            }
+          
+ 
+          var salt = bcrypt.genSaltSync(10);
+          req.body.userPassword = bcrypt.hashSync(userPassword, salt);
+        }
+        if (!userFname) {
+          deleteFile(req);
+          return res.send("First name is required");
+        }
+        if (!userLname) {
+          deleteFile(req);
+          return res.send("Last name is required");
+        }
+        if (!userInterests) {
+          deleteFile(req);
+          return res.send("Interests is required");
+        } else {
+          let interestsValues = [
+            "Reading",
+            "Writing",
+            "Sports",
+            "Hiking",
+            "Movies",
+            "Cooking",
+            "Singing",
+            "Travelling",
+            "Painting",
+            "Music",
+            "Gardening",
+            "Socializing",
+            "Pets",
+            "Meditaion",
+            "Running",
+          ];
+          let message =
+            "Valid input types for Interests are 'Reading', 'Writing', 'Sports', 'Hiking', 'Movies', 'Cooking', 'Singing', 'Travelling', 'Painting', 'Music',   'Gardening', 'Socializing',  'Pets',   'Meditaion',    'Running'";
+            let userInterests = req.body.userInterests.split(',')
+            let isMatch = userInterests.every((item)=>{
+              if(interestsValues.indexOf(item)!=-1) {
+                return true;
+              }
+              })
+              if(!isMatch){
+                return res.send(message);
+              }
+              req.body.userInterests = userInterests;
+        }
+        if (!userHaveKids) {
+          deleteFile(req);
+          return res.send("Do you have kids? field is required");
+        }
+        if (!userWantChildren) {
+          deleteFile(req);
+          return res.send("Do you want kids? field is required");
+        }
+        if (!userHeight) {
+          deleteFile(req);
+          return res.send("Height is required");
+        }
+        if (!userEducationStatus) {
+          deleteFile(req);
+          return res.send("Education status is required");
+        }
+        if (!userEthnicity) {
+          deleteFile(req);
+          return res.send("Ethnicity is required");
+        }
+        if (!userDrink) {
+          deleteFile(req);
+          return res.send("Do you drink? field is required");
+        }
+        if (!userSmoke) {
+          deleteFile(req);
+          return res.send("Do you smoke? field is required");
+        }
+        if (!userDOB) {
+          deleteFile(req);
+          return res.send("DOB is required");
+        }
+        if (!userLocation) {
+          deleteFile(req);
+          return res.send("Location is required");
+        }
+        if (!userRelationshipStatus) {
+          deleteFile(req);
+          return res.send("Relationship status is required");
+        }
+        req.body.userProfilePicture = req.file.filename;
+        let createdUser = await userModelMethod.createUser(req.body);
+        return res.status(200).send(`user signup Sucessfull:\n ${createdUser}`);
+      } catch (err) {
+        deleteFile(req);
+        return res.status(400).send(err);
+      }
     }
   });
 };

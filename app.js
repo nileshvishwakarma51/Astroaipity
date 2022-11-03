@@ -8,7 +8,11 @@ mongoose.connect(dbUrl);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/User", userRouter);
+app.use("/user", userRouter);
+
+app.all('/*', function (req, res) {
+  res.status(404).send("Requested resource not found");
+})
 
 app.listen(PORT, (err, res) => {
   if (err) {

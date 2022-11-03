@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 var defaultId = mongoose.Types.ObjectId(12345678);
-
 const userSchema = mongoose.Schema({
   userGender: {
     type: String,
@@ -31,7 +30,7 @@ const userSchema = mongoose.Schema({
   userPassword: {
     type: String,
     required: { value: true, message: "Password field is required" },
-    trim: true
+    trim: true,
   },
   userFname: {
     type: String,
@@ -56,7 +55,7 @@ const userSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "packageDetails",
     trim: true,
-    default : defaultId
+    default: defaultId,
   },
   userRelationshipStatus: {
     type: String,
@@ -151,19 +150,19 @@ const userSchema = mongoose.Schema({
   userAboutMe: {
     type: String,
     trim: true,
-    default : "Not provided"
+    default: "Not provided",
   },
   userDOB: {
     type: Date,
     required: { value: true, message: "Date-of-birth field is required" },
     trim: true,
-    default : "Not provided"
+    default: "Not provided",
   },
   userLocation: {
     type: String,
     uppercase: true,
     trim: true,
-    default : "Not provided"
+    default: "Not provided",
   },
 });
 
@@ -175,7 +174,7 @@ const createUser = async (userObj) => {
     return createdUser;
   } catch (err) {
     if (err.code === 11000) {
-      throw { message: "email must be unique" };
+      throw { message: "email already registered" };
     } else {
       if (err.name == "ValidationError") {
         for (field in err.errors) {
@@ -188,17 +187,16 @@ const createUser = async (userObj) => {
   }
 };
 
-// let getUser = async (userObj) => {
-//   try {
-//     console.log("get user :", userObj);
-//     const getuser = await user
-//       .find(userObj, { _id: false, __v: false })
-//       .populate("userCollegeId");
-//     return getuser;
-//   } catch (err) {
-//     console.log(err);
-//     throw new Error(err.message);
-//   }
-// };
+let getUserByEmail = async (userEmail) => {
+  try {
+    const getuser = await user.findOne(
+      { userEmail },
+      { userEmail: true, userPassword: true }
+    );
+    return getuser;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 
-module.exports = { createUser };
+module.exports = { createUser, getUserByEmail };

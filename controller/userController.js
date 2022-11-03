@@ -2,6 +2,8 @@ const userModelMethod = require("../model/userModel");
 const multer = require("multer");
 const fs = require("fs");
 var bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { JWTSecret } = require("../config/config");
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -77,10 +79,11 @@ let createUser = async (req, res) => {
           return res.send("Password is required");
         } else {
           if (!userPassword.length >= 8 && userPassword.length <= 16) {
-              return res.send("Password length mismatch. Length must be >=8 and <=16"); //validation success
-            }
-          
- 
+            return res.send(
+              "Password length mismatch. Length must be >=8 and <=16"
+            ); //validation success
+          }
+
           var salt = bcrypt.genSaltSync(10);
           req.body.userPassword = bcrypt.hashSync(userPassword, salt);
         }
@@ -115,16 +118,16 @@ let createUser = async (req, res) => {
           ];
           let message =
             "Valid input types for Interests are 'Reading', 'Writing', 'Sports', 'Hiking', 'Movies', 'Cooking', 'Singing', 'Travelling', 'Painting', 'Music',   'Gardening', 'Socializing',  'Pets',   'Meditaion',    'Running'";
-            let userInterests = req.body.userInterests.split(',')
-            let isMatch = userInterests.every((item)=>{
-              if(interestsValues.indexOf(item)!=-1) {
-                return true;
-              }
-              })
-              if(!isMatch){
-                return res.send(message);
-              }
-              req.body.userInterests = userInterests;
+          let userInterests = req.body.userInterests.split(",");
+          let isMatch = userInterests.every((item) => {
+            if (interestsValues.indexOf(item) != -1) {
+              return true;
+            }
+          });
+          if (!isMatch) {
+            return res.send(message);
+          }
+          req.body.userInterests = userInterests;
         }
         if (!userHaveKids) {
           deleteFile(req);
@@ -132,7 +135,7 @@ let createUser = async (req, res) => {
         }
         if (!userWantChildren) {
           deleteFile(req);
-          return res.send("Do you want kids? field is required");
+          return res.send("Do you want children? field is required");
         }
         if (!userHeight) {
           deleteFile(req);
@@ -168,7 +171,23 @@ let createUser = async (req, res) => {
         }
         req.body.userProfilePicture = req.file.filename;
         let createdUser = await userModelMethod.createUser(req.body);
-        return res.status(200).send(`user signup Sucessfull:\n ${createdUser}`);
+        jwt.sign(
+          { _id: createdUser._id, userEmail: createdUser.userEmail },
+          JWTSecret,
+          (error, token) => {
+            if (error) {
+              return res.status(500).send(err.message);
+            } else {
+              return res
+                .status(200)
+                .send({
+                  _id: createdUser._id,
+                  userEmail: createdUser.userEmail,
+                  token,
+                });
+            }
+          }
+        );
       } catch (err) {
         deleteFile(req);
         return res.status(400).send(err);
@@ -177,4 +196,42 @@ let createUser = async (req, res) => {
   });
 };
 
-module.exports = { createUser };
+let loginUser = async (req, res, next) => {
+  const { userEmail, userPassword } = req.body;
+  if (!userEmail) {
+    return res.send("User email is required");
+  }
+  if (!userPassword) {
+    return res.send("User password is required");
+  }
+  try {
+    let getUser = await userModelMethod.getUserByEmail(userEmail);
+    if (!getUser) {
+      return res.status(404).send(`Email not registered: ${userEmail}`);
+    }
+    let isPasswordMatch = bcrypt.compareSync(
+      userPassword,
+      getUser.userPassword
+    );
+    if (!isPasswordMatch) {
+      return res.status(404).send(`Password is incorrect`);
+    }
+    jwt.sign(
+      { _id: getUser._id, userEmail: getUser.userEmail },
+      JWTSecret,
+      (error, token) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).send(err.message);
+        } else {
+          return res
+            .status(200)
+            .send({ _id: getUser._id, userEmail: getUser.userEmail, token });
+        }
+      }
+    );
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+};
+module.exports = { createUser, loginUser };

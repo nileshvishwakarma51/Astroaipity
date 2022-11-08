@@ -3,12 +3,14 @@ const app = express();
 const mongoose = require("mongoose");
 const { PORT, dbUrl } = require("./config/config");
 const userRouter = require("./routes/user.routes");
+const packageRouter = require("./routes/package.routes");
 mongoose.connect(dbUrl);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/user", userRouter);
+app.use("/package", packageRouter);
 
 app.all('/*', function (req, res) {
   res.status(404).send("Requested resource not found");

@@ -196,7 +196,7 @@ let createUser = async (req, res) => {
   });
 };
 
-let loginUser = async (req, res, next) => {
+let loginUser = async (req, res) => {
   const { userEmail, userPassword } = req.body;
   if (!userEmail) {
     return res.send("User email is required");

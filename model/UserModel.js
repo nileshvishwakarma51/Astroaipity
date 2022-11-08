@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-var defaultId = mongoose.Types.ObjectId(12345678);
 const userSchema = mongoose.Schema({
   userGender: {
     type: String,
@@ -55,7 +54,7 @@ const userSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "packageDetails",
     trim: true,
-    default: defaultId,
+    default: null,
   },
   userRelationshipStatus: {
     type: String,

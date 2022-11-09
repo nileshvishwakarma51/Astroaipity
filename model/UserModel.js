@@ -163,6 +163,11 @@ const userSchema = mongoose.Schema({
     trim: true,
     default: "Not provided",
   },
+  pkgPurchasedDate: {
+    type: Date,
+    trim: true,
+    default: null,
+  },
 });
 
 const user = mongoose.model("userDetails", userSchema);
@@ -198,4 +203,22 @@ let getUserByEmail = async (userEmail) => {
   }
 };
 
-module.exports = { createUser, getUserByEmail };
+let subscribePkg = async (_id, userPackageId) => {
+  try {
+    const getuser = await user.findByIdAndUpdate(
+      _id,
+      {
+        userPackageId,
+        pkgPurchasedDate: Date.now(),
+      },
+      {
+        new: true,
+      }
+    ).populate("userPackageId");
+    return getuser;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+module.exports = { createUser, getUserByEmail, subscribePkg };

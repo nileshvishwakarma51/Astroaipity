@@ -173,7 +173,7 @@ let createUser = async (req, res) => {
         let createdUser = await userModelMethod.createUser(req.body);
         jwt.sign(
           { _id: createdUser._id, userEmail: createdUser.userEmail },
-          JWTSecret,
+          JWTSecret,{expiresIn:"1800s"},
           (error, token) => {
             if (error) {
               return res.status(500).send(err.message);
@@ -218,7 +218,7 @@ let loginUser = async (req, res) => {
     }
     jwt.sign(
       { _id: getUser._id, userEmail: getUser.userEmail },
-      JWTSecret,
+      JWTSecret,{expiresIn:"1800s"},
       (error, token) => {
         if (error) {
           console.log(error);
@@ -234,4 +234,18 @@ let loginUser = async (req, res) => {
     return res.status(400).send(err);
   }
 };
-module.exports = { createUser, loginUser };
+
+let subscribePkg = async (req, res) => {    
+  try {     
+    let userPackageId = req.body.pkgId;
+    let subscribePkg = await userModelMethod.subscribePkg(req._id,userPackageId);  
+    return res
+    .status(200)
+    .send(subscribePkg);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send(err);
+  }
+}; 
+
+module.exports = { createUser, loginUser, subscribePkg };
